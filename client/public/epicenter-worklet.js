@@ -139,7 +139,8 @@
         lowMidBody: new BiquadFilter("bandpass", bodyHz, sampleRate, 0.85),
         lowMidDip: new BiquadFilter("bandpass", bodyHz * 1.18, sampleRate, 1.1),
         subLowpass: new BiquadFilter("lowpass", subTopHz, sampleRate, 0.707),
-        outputDcHighpass: new BiquadFilter("highpass", 18, sampleRate, 0.707)
+        outputDcHighpass: new BiquadFilter("highpass", 18, sampleRate, 0.707),
+        voiceEnv: new EnvelopeFollower(this.coeffFromMs(6), this.coeffFromMs(110))
       };
     }
     createMonoState(params) {
@@ -250,9 +251,10 @@
       const balanceNorm = Math.max(0, Math.min(100, balance)) / 100;
       const widthNorm = Math.max(0, Math.min(100, width)) / 100;
       const volumeGain = Math.max(0, Math.min(1.5, volume / 100));
-      const synthAmount = 0.45 + intensityNorm * 1.45;
-      const bassProgramAmount = 0.6 + balanceNorm * 0.35;
-      const lowMidDipAmount = (0.12 + intensityNorm * 0.28) * (0.55 + widthNorm * 0.45);
+      const synthAmount = 0.42 + intensityNorm * 1.28;
+      const bassProgramAmount = 0.68 + balanceNorm * 0.38;
+      const lowMidBodyAmount = 0.12 + balanceNorm * 0.08;
+      const lowMidDipAmount = (0.08 + intensityNorm * 0.16) * (0.45 + widthNorm * 0.3);
       const gateHoldSamples = Math.floor(sampleRate * (0.025 + intensityNorm * 0.06));
       for (let i = 0; i < blockSize; i++) {
         const left = input[0][i] ?? 0;
@@ -291,14 +293,17 @@
         for (let i = 0; i < blockSize; i++) {
           const sample = this.denormalFloor(inChan[i]);
           const voicePath = state.voiceHighpass.process(sample);
+          const voicePresence = state.voiceEnv.process(voicePath);
+          const voiceProtection = Math.max(0.5, 1 - voicePresence * (0.85 + intensityNorm * 0.3));
           const bassProgram = state.bassLowpass.process(sample);
           const body = state.lowMidBody.process(sample);
           const dip = state.lowMidDip.process(sample);
-          const shapedBassProgram = bassProgram * bassProgramAmount + body * (0.18 + balanceNorm * 0.12) - dip * lowMidDipAmount;
-          const generatedSub = state.subLowpass.process(subBuffer[i]);
+          const shapedBassProgram = bassProgram * bassProgramAmount + body * lowMidBodyAmount * (0.45 + voiceProtection * 0.55) - dip * lowMidDipAmount;
+          const generatedSub = state.subLowpass.process(subBuffer[i]) * (0.4 + voiceProtection * 0.6);
           let mixed = voicePath + shapedBassProgram + generatedSub;
-          mixed *= volumeGain;
-          mixed = Math.tanh(mixed * 1.08) / Math.tanh(1.08);
+          const protectionGain = 0.94 + voiceProtection * 0.06;
+          mixed *= volumeGain * protectionGain;
+          mixed = Math.tanh(mixed * 0.94) / Math.tanh(0.94);
           mixed = state.outputDcHighpass.process(mixed);
           outChan[i] = this.denormalFloor(mixed);
         }
