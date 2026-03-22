@@ -65,6 +65,7 @@ import { BottomNavigation } from '@/components/BottomNavigation';
 import { TrackArtwork } from '@/components/TrackArtwork';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAndroidMusicLibrary, type AndroidMusicFile } from '@/hooks/useAndroidMusicLibrary';
+import { hiresAudioBadgeUrl, hiresLogoUrl } from '@/lib/assetUrls';
 import { toast } from 'sonner';
 
 const clampDspParam = (key: keyof StreamingParams, value: number): number => {
@@ -1241,7 +1242,7 @@ export default function Home() {
                     {queue.currentTrack?.isHiRes && (
                       <div className="mb-2 flex justify-center">
                         <div className="inline-flex items-center rounded-md border border-white/70 bg-black/35 px-2 py-1">
-                          <img src="/hires-audio.svg" alt="Hi-Res Audio" className="h-7 w-auto object-contain" />
+                          <img src={hiresAudioBadgeUrl} alt="Hi-Res Audio" className="h-7 w-auto object-contain" />
                         </div>
                       </div>
                     )}
@@ -1375,7 +1376,7 @@ export default function Home() {
 
                 <button onClick={() => setLibraryView('hires')} className="w-full flex items-center gap-4 p-4 rounded-xl bg-zinc-900/50 hover:bg-zinc-900 transition-colors">
                   <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-yellow-500 flex items-center justify-center">
-                    <img src="/hires-logo.svg" alt="Hi-Res Audio" className="w-7 h-7" />
+                    <img src={hiresLogoUrl} alt="Hi-Res Audio" className="w-7 h-7 object-contain" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-semibold">{t('library.highResolution')}</p>
