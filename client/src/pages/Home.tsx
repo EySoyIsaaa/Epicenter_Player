@@ -62,6 +62,7 @@ import { SwipeableTrackItem } from '@/components/SwipeableTrackItem';
 import { AndroidMusicImporter } from '@/components/AndroidMusicImporter';
 import { MusicScanner } from '@/components/MusicScanner';
 import { BottomNavigation } from '@/components/BottomNavigation';
+import { TrackArtwork } from '@/components/TrackArtwork';
 import { useLanguage } from '@/hooks/useLanguage';
 import { useAndroidMusicLibrary, type AndroidMusicFile } from '@/hooks/useAndroidMusicLibrary';
 import { toast } from 'sonner';
@@ -1030,13 +1031,7 @@ export default function Home() {
                         }`}
                       >
                         <div className="w-10 h-10 rounded-lg bg-zinc-700 overflow-hidden flex-shrink-0">
-                          {track.coverUrl ? (
-                            <img src={track.coverUrl} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Disc3 className="w-5 h-5 text-zinc-500" strokeWidth={1} />
-                            </div>
-                          )}
+                          <TrackArtwork src={track.coverUrl} alt={track.title} iconClassName="w-5 h-5 text-zinc-500" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-medium text-sm truncate">{track.title}</p>
@@ -1110,13 +1105,7 @@ export default function Home() {
                         >
                           <div className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/80">
                             <div className="w-10 h-10 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0">
-                              {queue.currentTrack.coverUrl ? (
-                                <img src={queue.currentTrack.coverUrl} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Disc3 className="w-5 h-5 text-zinc-600" strokeWidth={1} />
-                                </div>
-                              )}
+                              <TrackArtwork src={queue.currentTrack.coverUrl} alt={queue.currentTrack.title} iconClassName="w-5 h-5 text-zinc-500" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold truncate text-white underline decoration-amber-400/80 underline-offset-4">
@@ -1127,7 +1116,8 @@ export default function Home() {
                                 <AudioQualityBadge
                                   bitDepth={queue.currentTrack.bitDepth}
                                   sampleRate={queue.currentTrack.sampleRate}
-                                 
+                                  bitrate={queue.currentTrack.bitrate}
+                                  isHiRes={queue.currentTrack.isHiRes}
                                   compact
                                 />
                               </div>
@@ -1179,13 +1169,7 @@ export default function Home() {
                           
                           <div className="flex-1 flex items-center gap-3 min-w-0" onClick={() => queue.playTrack(actualIndex)}>
                             <div className="w-10 h-10 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0">
-                              {track.coverUrl ? (
-                                <img src={track.coverUrl} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Disc3 className="w-5 h-5 text-zinc-600" strokeWidth={1} />
-                                </div>
-                              )}
+                              <TrackArtwork src={track.coverUrl} alt={track.title} iconClassName="w-5 h-5 text-zinc-500" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium truncate text-zinc-300">
@@ -1193,7 +1177,7 @@ export default function Home() {
                               </p>
                               <div className="flex items-center gap-2">
                                 <p className="text-xs text-zinc-500 truncate">{track.artist}</p>
-                                <AudioQualityBadge bitDepth={track.bitDepth} sampleRate={track.sampleRate} compact />
+                                <AudioQualityBadge bitDepth={track.bitDepth} sampleRate={track.sampleRate} bitrate={track.bitrate} isHiRes={track.isHiRes} compact />
                               </div>
                             </div>
                           </div>
@@ -1228,17 +1212,16 @@ export default function Home() {
                 <div className="flex-1 min-h-0 flex items-start justify-center px-5 sm:px-8 pt-16 pb-4 sm:pt-16 sm:pb-5">
                   <div className="relative w-full max-w-[78vw] sm:max-w-[320px] aspect-square">
                     <div className="w-full h-full rounded-[28px] bg-zinc-900/70 backdrop-blur-md border border-white/10 album-shadow overflow-hidden shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
-                      {queue.currentTrack?.coverUrl ? (
-                        <img key={queue.currentTrack.id} src={queue.currentTrack.coverUrl} alt={queue.currentTrack.title} className="w-full h-full object-cover transition-all duration-700" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
-                          <Disc3 className="w-20 h-20 text-zinc-600" strokeWidth={1} />
-                        </div>
-                      )}
+                      <TrackArtwork
+                        src={queue.currentTrack?.coverUrl}
+                        alt={queue.currentTrack?.title}
+                        className="w-full h-full object-cover transition-all duration-700"
+                        iconClassName="w-20 h-20 text-zinc-500"
+                      />
                     </div>
                     {queue.currentTrack && (
                       <div className="absolute -bottom-3 left-1/2 -translate-x-1/2">
-                        <AudioQualityBadge bitDepth={queue.currentTrack.bitDepth} sampleRate={queue.currentTrack.sampleRate} />
+                        <AudioQualityBadge bitDepth={queue.currentTrack.bitDepth} sampleRate={queue.currentTrack.sampleRate} bitrate={queue.currentTrack.bitrate} isHiRes={queue.currentTrack.isHiRes} />
                       </div>
                     )}
                   </div>
@@ -1257,13 +1240,8 @@ export default function Home() {
                   <div className="px-5 sm:px-8 mb-2">
                     {queue.currentTrack?.isHiRes && (
                       <div className="mb-2 flex justify-center">
-                        <div className="inline-flex items-center gap-1.5 rounded-md border border-white/70 bg-black/35 px-2 py-1">
-                          <svg width="14" height="10" viewBox="0 0 14 10" fill="none" xmlns="http://www.w3.org/2000/svg" className="opacity-95">
-                            <rect x="0.5" y="0.5" width="13" height="9" rx="2" stroke="currentColor" className="text-white"/>
-                            <rect x="3" y="2.2" width="2" height="5.6" fill="currentColor" className="text-white"/>
-                            <rect x="8.8" y="2.2" width="2" height="5.6" fill="currentColor" className="text-white"/>
-                          </svg>
-                          <span className="text-[10px] font-semibold tracking-tight text-white">Dolby Atmos</span>
+                        <div className="inline-flex items-center rounded-md border border-white/70 bg-black/35 px-2 py-1">
+                          <img src="/hires-audio.svg" alt="Hi-Res Audio" className="h-7 w-auto object-contain" />
                         </div>
                       </div>
                     )}
@@ -1447,11 +1425,7 @@ export default function Home() {
                         onClick={() => { setSelectedPlaylist(playlist); setLibraryView('playlist-detail'); }}
                       >
                         <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center overflow-hidden">
-                          {playlist.tracks[0]?.coverUrl ? (
-                            <img src={playlist.tracks[0].coverUrl} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <ListMusic className="w-6 h-6 text-white" />
-                          )}
+                          <TrackArtwork src={playlist.tracks[0]?.coverUrl} alt={playlist.name} iconClassName="w-6 h-6 text-zinc-300" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold truncate">{playlist.name}</p>
@@ -1541,13 +1515,7 @@ export default function Home() {
                     <div key={track.id} className="flex items-center gap-3 p-3 rounded-xl hover:bg-zinc-900/50 transition-colors">
                       <div className="flex-1 flex items-center gap-3 min-w-0 cursor-pointer" onClick={() => handlePlayNow(track)}>
                         <div className="w-10 h-10 rounded-lg bg-zinc-800 overflow-hidden flex-shrink-0">
-                          {track.coverUrl ? (
-                            <img src={track.coverUrl} alt="" className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                              <Disc3 className="w-5 h-5 text-zinc-600" strokeWidth={1} />
-                            </div>
-                          )}
+                          <TrackArtwork src={track.coverUrl} alt={track.title} iconClassName="w-5 h-5 text-zinc-500" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-sm font-medium truncate">{track.title}</p>
@@ -1710,13 +1678,7 @@ export default function Home() {
                 {Object.entries(albums).map(([album, tracks]) => (
                   <div key={album} className="bg-zinc-900/50 rounded-xl p-3 hover:bg-zinc-900 transition-colors">
                     <div className="aspect-square rounded-lg bg-zinc-800 mb-2 overflow-hidden cursor-pointer" onClick={() => handlePlayNow(tracks[0])}>
-                      {tracks[0].coverUrl ? (
-                        <img src={tracks[0].coverUrl} alt="" className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Folder className="w-8 h-8 text-zinc-600" />
-                        </div>
-                      )}
+                      <TrackArtwork src={tracks[0].coverUrl} alt={album} iconClassName="w-8 h-8 text-zinc-500" />
                     </div>
                     <p className="font-medium text-sm truncate">{album}</p>
                     <div className="flex items-center justify-between mt-1">

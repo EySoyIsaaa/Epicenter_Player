@@ -15,6 +15,7 @@ export interface AndroidMusicFile {
   albumArtUri?: string;
   bitDepth?: number;
   sampleRate?: number;
+  bitrate?: number;
   isHiRes?: boolean;
 }
 
@@ -118,6 +119,7 @@ export function useAndroidMusicLibrary() {
           albumArtUri: file.albumArtUri || '',
           bitDepth: typeof file.bitDepth === 'number' ? file.bitDepth : undefined,
           sampleRate: typeof file.sampleRate === 'number' ? file.sampleRate : undefined,
+          bitrate: typeof file.bitrate === 'number' ? file.bitrate : undefined,
           isHiRes: typeof file.isHiRes === 'boolean' ? file.isHiRes : undefined,
         }));
       
