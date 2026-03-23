@@ -88,7 +88,7 @@ import {
   useAndroidMusicLibrary,
   type AndroidMusicFile,
 } from "@/hooks/useAndroidMusicLibrary";
-import { hiresAudioBadgeUrl, hiresLogoUrl } from "@/lib/assetUrls";
+import { appLogoUrl, hiresAudioBadgeUrl, hiresLogoUrl } from "@/lib/assetUrls";
 import { toast } from "sonner";
 
 const clampDspParam = (key: keyof StreamingParams, value: number): number => {
@@ -2013,14 +2013,12 @@ export default function Home() {
               </div>
               <div className="space-y-4">
                 <div className="flex items-center gap-4 p-3 bg-zinc-800/50 rounded-xl">
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-red-600 to-red-800 flex items-center justify-center">
-                    <svg
-                      className="w-8 h-8 text-white"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                    >
-                      <path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z" />
-                    </svg>
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-zinc-950 to-zinc-800 flex items-center justify-center overflow-hidden p-2">
+                    <img
+                      src={appLogoUrl}
+                      alt={t("app.name")}
+                      className="w-full h-full object-contain"
+                    />
                   </div>
                   <div>
                     <h4 className="font-bold">{t("app.name")}</h4>
