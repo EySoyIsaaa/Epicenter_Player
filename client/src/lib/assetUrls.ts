@@ -1,4 +1,6 @@
-const withBase = (assetPath: string) => `${import.meta.env.BASE_URL}${assetPath}`;
+import appLogoAssetUrl from "../../../LogoAPP.svg?url";
+import hiResLogoAssetUrl from "../../../Hi-Res_Audio_(logo).svg?url";
 
-export const hiresLogoUrl = withBase('hires-logo.svg');
-export const hiresAudioBadgeUrl = withBase('hires-audio.svg');
+export const appLogoUrl = appLogoAssetUrl;
+export const hiresLogoUrl = hiResLogoAssetUrl;
+export const hiresAudioBadgeUrl = hiResLogoAssetUrl;
