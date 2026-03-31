@@ -100,6 +100,8 @@
     "songsAddedPlural": "{count} songs added",
     "errorAddingSongs": "Error adding songs",
     "errorLoadingTrack": "Error loading track",
+    "errorLoadingTrackSkipped": "Error loading track. That song was skipped and playback continued with the next one.",
+    "errorLoadingTrackNoFallback": "Error loading track. There are no more playable songs to continue.",
     "autoOptimized": "Auto optimization applied",
     "importingMusic": "Importing music",
     "ofTotal": "{current} of {total}",

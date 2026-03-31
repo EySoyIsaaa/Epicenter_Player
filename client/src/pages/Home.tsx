@@ -174,6 +174,7 @@ export default function Home() {
   const trackLoadRequestRef = useRef(0);
   const playTimeoutRef = useRef<number | null>(null);
   const autoOptimizationTimeoutRef = useRef<number | null>(null);
+  const failedQueueTrackIdsRef = useRef<Set<string>>(new Set());
 
   const hiResTracks = useMemo(
     () => queue.library.filter((track) => track.isHiRes),
@@ -436,6 +437,34 @@ export default function Home() {
     [androidMusicLibrary, queue.getTrackFile, queue.library],
   );
 
+  const playNextAvailableTrackAfterFailure = useCallback(
+    (failedQueueTrackId: string) => {
+      if (queue.queue.length <= 1) {
+        return false;
+      }
+
+      const startIndex = queue.currentTrackIndex;
+      for (let offset = 1; offset < queue.queue.length; offset += 1) {
+        const candidateIndex = (startIndex + offset) % queue.queue.length;
+        const candidateTrack = queue.queue[candidateIndex];
+
+        if (!candidateTrack || candidateTrack.id === failedQueueTrackId) {
+          continue;
+        }
+
+        if (failedQueueTrackIdsRef.current.has(candidateTrack.id)) {
+          continue;
+        }
+
+        queue.playTrack(candidateIndex);
+        return true;
+      }
+
+      return false;
+    },
+    [queue.currentTrackIndex, queue.playTrack, queue.queue],
+  );
+
   useEffect(() => {
     return () => {
       trackLoadRequestRef.current += 1;
@@ -571,9 +600,19 @@ export default function Home() {
           trackLoadRequestRef.current === requestId &&
           queue.currentTrack?.id === requestedTrack.id
         ) {
+          failedQueueTrackIdsRef.current.add(requestedTrack.id);
+          audioProcessor.resetAfterError();
           currentTrackRef.current = null;
           console.error("Error loading track:", error);
-          toast.error(t("actions.errorLoadingTrack"));
+          const movedToNextTrack = playNextAvailableTrackAfterFailure(
+            requestedTrack.id,
+          );
+
+          if (movedToNextTrack) {
+            toast.error(t("actions.errorLoadingTrackSkipped"));
+          } else {
+            toast.error(t("actions.errorLoadingTrackNoFallback"));
+          }
         }
       }
     };
@@ -586,7 +625,10 @@ export default function Home() {
     lastTrack.saveLastTrack,
     queue.currentTrack,
     queue.library,
+    queue.playTrack,
+    queue.queue,
     resolveTrackSource,
+    playNextAvailableTrackAfterFailure,
     t,
   ]);
 
